@@ -3,9 +3,13 @@ package br.com.Telas;
 import br.com.Telas.Cadastros.Cadastro;
 import br.com.Telas.Cadastros.PesquisaCadastro;
 import br.com.Telas.Disciplinas.TelaDisciplinas;
-import br.com.classe.Aluno;
-import br.com.classe.Curso;
+import br.com.Class.Aluno;
+import br.com.Class.Curso;
+import br.com.Class.Pessoa;
+import br.com.Telas.Disciplinas.TelaCadFuncionarios;
 import br.com.Telas.Professores.TelaProfessor;
+import br.com.conexoes.ConexaoSQLite;
+import br.com.conexoes.TabelaBanco.BancoSQLite;
 import java.awt.Color;
 import java.util.ArrayList;
 
@@ -28,9 +32,15 @@ public class MenuPrincipal extends javax.swing.JFrame {
     public MenuPrincipal(){
         
         initComponents();
-        curso.addListAluno(listaCadastro);
+        //curso.addListAluno(listaCadastro);
         btn_Config2.setVisible(false);
 
+    //---------- INSTANCIAÇÃO DAS CLASS DE CONEXAO COM BANCO ----------//
+        
+        ConexaoSQLite conexaoSQL = new ConexaoSQLite();
+        BancoSQLite   bancoSQL   = new BancoSQLite(conexaoSQL);
+        cad.setBancoSQL(bancoSQL);
+        
 //------------------------------------------------------------------------------//
         
         panedefault = new Color(0,62,172);
@@ -55,7 +65,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     
     Curso curso = new Curso();
     Aluno aluno = new Aluno();
-    ArrayList<Aluno> listaCadastro = new ArrayList<>();
+    ArrayList<Pessoa> listaCadastro = new ArrayList<>();
     Notas notas = new Notas();
     
 /*------------------------------------------------------------------------------
@@ -67,6 +77,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     TelaPerfil p = new TelaPerfil();
     PesquisaCadastro pesquisa = new PesquisaCadastro();
     TelaProfessor pf = new TelaProfessor();
+    TelaCadFuncionarios telacad = new TelaCadFuncionarios();
 
     
 /*------------------------------------------------------------------------------
@@ -133,14 +144,15 @@ public class MenuPrincipal extends javax.swing.JFrame {
         panel3.setBackground(panedefault);
         panel4.setBackground(paneClicked);// Selecionado
         panel5.setBackground(panedefault);
-        //Chama Tela de Disciplinas:
+        
+//Chama Tela de Disciplinas:
         try {
             
             pf.setSize(1230, 620);
             pf.setLocation(0,0);
             pf.setVisible(true);
             jDesktopPane1.removeAll(); // Remove Objetos Limpando a Area de Trabalho:
-            jDesktopPane1.add(pf);// Adiciona o Objeto na Area de Trabalho:
+            jDesktopPane1.add(pf);// Adiciona o Objeto "TelaDisciplinas" na Area de Trabalho:
             
 //------------------------- Normaliza o Menu Lateral: --------------------------          
             
@@ -755,6 +767,15 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
         jcursos.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jcursos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/icones/png/128x128/shopping-bag-blue.png"))); // NOI18N
+        jcursos.addAncestorListener(new javax.swing.event.AncestorListener() {
+            public void ancestorAdded(javax.swing.event.AncestorEvent evt) {
+                jcursosAncestorAdded(evt);
+            }
+            public void ancestorMoved(javax.swing.event.AncestorEvent evt) {
+            }
+            public void ancestorRemoved(javax.swing.event.AncestorEvent evt) {
+            }
+        });
         jcursos.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 FocoDoMouse(evt);
@@ -802,11 +823,6 @@ public class MenuPrincipal extends javax.swing.JFrame {
         jPanel1.add(panel_Disciplinas, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 30, 150, 160));
 
         panel_Professores.setBackground(new java.awt.Color(37, 51, 61));
-        panel_Professores.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                panel_ProfessoresMouseClicked(evt);
-            }
-        });
         panel_Professores.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel6.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -819,6 +835,9 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
         jprofessores.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/icones/png/128x128/users.png"))); // NOI18N
         jprofessores.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jprofessoresMouseClicked(evt);
+            }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 FocoDoMouse(evt);
             }
@@ -871,6 +890,8 @@ public class MenuPrincipal extends javax.swing.JFrame {
         jLabel9.setText("Ajuda:");
         jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 370, 60, 30));
 
+        jDesktopPane1.setLayer(jPanel1, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
         javax.swing.GroupLayout jDesktopPane1Layout = new javax.swing.GroupLayout(jDesktopPane1);
         jDesktopPane1.setLayout(jDesktopPane1Layout);
         jDesktopPane1Layout.setHorizontalGroup(
@@ -891,7 +912,6 @@ public class MenuPrincipal extends javax.swing.JFrame {
                     .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 410, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGap(0, 0, Short.MAX_VALUE)))
         );
-        jDesktopPane1.setLayer(jPanel1, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         getContentPane().add(jDesktopPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 70, 1230, 620));
 
@@ -1005,7 +1025,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_jp_CronogramaMouseClicked
    
     private void jp_DisciplinasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jp_DisciplinasMouseClicked
-        ClickedjpDisciplinas();
+        telacad.setVisible(true);
     }//GEN-LAST:event_jp_DisciplinasMouseClicked
 
     private void jp_PerfilMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jp_PerfilMouseClicked
@@ -1109,7 +1129,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
 //          Abrir Tela de Cadastro:
     private void btn_CadastroMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_CadastroMouseClicked
         
-        cad.setListAlunos(listaCadastro);
+        cad.setListPessoa(listaCadastro);
         cad.setCurso(curso);
         cad.setVisible(true);
         
@@ -1145,7 +1165,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_HomeMouseClicked
 
     private void PesquisarCadastrosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_PesquisarCadastrosMouseClicked
-        pesquisa.setListAlunos(listaCadastro);
+        //pesquisa.setListAlunos(listaCadastro);
         pesquisa.setCurso(curso);
         pesquisa.setVisible(true);
     }//GEN-LAST:event_PesquisarCadastrosMouseClicked
@@ -1166,17 +1186,21 @@ public class MenuPrincipal extends javax.swing.JFrame {
         
     }//GEN-LAST:event_jnotasMouseClicked
 
-    private void panel_ProfessoresMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_panel_ProfessoresMouseClicked
-        ClickedjpProfessores();
-    }//GEN-LAST:event_panel_ProfessoresMouseClicked
-
     private void panel_DisciplinasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_panel_DisciplinasMouseClicked
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_panel_DisciplinasMouseClicked
-//TELA Professor
+// -TELA Professor
     private void jPanel6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel6MouseClicked
         
     }//GEN-LAST:event_jPanel6MouseClicked
+
+    private void jcursosAncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_jcursosAncestorAdded
+        
+    }//GEN-LAST:event_jcursosAncestorAdded
+
+    private void jprofessoresMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jprofessoresMouseClicked
+        ClickedjpProfessores();
+    }//GEN-LAST:event_jprofessoresMouseClicked
 
     public static void main(String args[]) {
                        

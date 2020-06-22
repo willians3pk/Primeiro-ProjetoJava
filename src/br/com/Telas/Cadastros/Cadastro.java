@@ -1,38 +1,43 @@
+
 package br.com.Telas.Cadastros;
 
-import br.com.classe.Aluno;
-import br.com.classe.Curso;
-import br.com.classe.Endereco;
-import br.com.conexao.HibernateUtil;
+import br.com.Class.Curso;
+import br.com.Class.Endereco;
+import br.com.Class.Pessoa;
+import br.com.conexoes.TabelaBanco.BancoSQLite;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 public class Cadastro extends javax.swing.JFrame {
+    
+    BancoSQLite bancoSQL;
 
-    public Cadastro() {
-        initComponents();
-
+    public void setBancoSQL(BancoSQLite bancoSQL) {
+        this.bancoSQL = bancoSQL;
     }
-    /*------------------------------------------------------------------------------
+    
+    public Cadastro() {
+    initComponents();
+    }
+/*------------------------------------------------------------------------------
  ---------------------- OBJETOS DAS CLASSES ------------------------------------
  ------------------------------------------------------------------------------*/
-
-    ArrayList<Aluno> listCadastro;
-    Curso curso;
-
-    public void setListAlunos(ArrayList<Aluno> listAlunos) {
+    
+    ArrayList<Pessoa> listCadastro;
+    Curso curso;    
+        
+    public void setListPessoa(ArrayList<Pessoa> listAlunos) {
         this.listCadastro = listAlunos;
     }
-
+    
     public void setCurso(Curso curso) {
         this.curso = curso;
     }
-
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -267,8 +272,8 @@ public class Cadastro extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    public void Limpar() {
-
+    public void Limpar(){
+        
         camp_Nome.setText("");
         camp_DataNascimento.setText("");
         camp_Cpf.setText("");
@@ -279,100 +284,98 @@ public class Cadastro extends javax.swing.JFrame {
         camp_Cidade.setText("");
         camp_Estado.setText("");
         camp_Numero.setText("");
-
+            
     }
-
+    
     private void btn_CadastrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_CadastrarActionPerformed
-
-        if (camp_Nome.getText().equals("") & camp_Email.getText().equals("")
-                & camp_Rua.getText().equals("") & camp_Bairro.getText().equals("")
-                & camp_Cidade.getText().equals("") & camp_Estado.getText().equals("")
-                & camp_Numero.getText().equals("")) {
-
+                
+        if(camp_Nome.getText().equals("") & camp_Email.getText().equals("") 
+            & camp_Rua.getText().equals("") & camp_Bairro.getText().equals("") 
+                & camp_Cidade.getText().equals("") & camp_Estado.getText().equals("") 
+                    & camp_Numero.getText().equals("")){
+            
             JOptionPane.showMessageDialog(null, "Preencha todos os campos de Cadastro!!!");
-
-        } else {
+            
+        }else{
             //------ CRIA NOVO ALUNO ------
-            Aluno aluno = new Aluno();
+            Pessoa pessoa = new Pessoa();
             Endereco end = new Endereco();
             //-----------------------------
-
+            
 //------------------- Endereco do Aluno ----------------------------------------   
+            
             end.setRua(camp_Rua.getText());
             end.setBairro(camp_Bairro.getText());
             end.setCidade(camp_Cidade.getText());
             end.setEstado(camp_Estado.getText());
             end.setNumeroCasa(camp_Numero.getHeight());
-
+            
 //------------------- Dados do Aluno -------------------------------------------           
-            aluno.setNome(camp_Nome.getText());
-            aluno.setDataNascimento(camp_DataNascimento.getText());
-            aluno.setCpf(camp_Cpf.getText());
-            aluno.setTelefone(camp_Contato.getText());
-            aluno.setEmail(camp_Email.getText());
-            aluno.setEndereco(end);
-
+            pessoa.setNome(camp_Nome.getText());
+            pessoa.setDataNascimento(camp_DataNascimento.getText());
+            pessoa.setCpf(camp_Cpf.getText());
+            pessoa.setTelefone(camp_Contato.getText());
+            pessoa.setEmail(camp_Email.getText());
+            pessoa.setEndereco(end);
+            
             String Sexo = (String) box_Sexo.getSelectedItem();
-            if (Sexo.equals("Femenino")) {
-                aluno.setSexo("Femenino");
-            } else if (Sexo.equals("Masculino")) {
-                aluno.setSexo("Masculino");
+            if(Sexo.equals("Femenino")){
+                pessoa.setSexo("Femenino");
+            }else if(Sexo.equals("Masculino")){
+                pessoa.setSexo("Masculino");
             }
-
+            
+            
 //------------------- Adiciona os dados a lista de cadastro --------------------
-            Session session = null;
-            Transaction tx = null;
-            session = HibernateUtil.getSessionFactory().openSession();
-            tx = session.beginTransaction();
+                listCadastro.add(pessoa);
             try {
-                session.save(aluno);
-                tx.commit();
-                //listCadastro.add(aluno); //ADICIONA NO BANCO DE DADOS
-
-            } catch (Exception ex) {
+                
+                bancoSQL.insertPessoa(pessoa); //ADICIONA NO BANCO DE DADOS
+                
+            } catch (SQLException ex) {
                 Logger.getLogger(Cadastro.class.getName()).log(Level.SEVERE, null, ex);
                 JOptionPane.showMessageDialog(null, ex.getMessage());
             }
-
-            if (box_Imprimir.isSelected()) {
-                aluno.SalvarBlocoNotas();
-            } // SALVA BLOCO DE NOTAS NA AREA DE TRABALHO
+            
+            if(box_Imprimir.isSelected()){pessoa.SalvarBlocoNotas();} // SALVA BLOCO DE NOTAS NA AREA DE TRABALHO
             //ATUALIZA O NUMERO DE CADASTRADOS
-            NumeroCadastrado.setText("Quant.Cadastrados: " + curso.quantidadeAluno());
+            NumeroCadastrado.setText("Quant.Cadastrados: " +curso.quantidadeAluno());
 
 //------------------- Alimenta a Tabela de alunos Cadastrados ------------------            
             DefaultTableModel val = (DefaultTableModel) jTabela.getModel();
 
-            val.addRow(new Object[]{
-                aluno.getNome(),
-                aluno.getCpf(),
-                aluno.getTelefone(),
-                aluno.getEmail()
-            });
-
-            camp_Nome.requestFocus();// Volta o Cursor do mouse:
-
+                val.addRow(new Object[]{
+                    pessoa.getNome(),
+                    pessoa.getCpf(),
+                    pessoa.getTelefone(),
+                    pessoa.getEmail()
+                });
+            
+            
+                camp_Nome.requestFocus();// Volta o Cursor do mouse:
+               
 //------------------- Limpar todos os Campos ----------------------------------           
-            Limpar(); // LIMPA OS CAMPOS:
-            JOptionPane.showMessageDialog(null, "Cadastrado com Sucesso!!!");
+                Limpar(); // LIMPA OS CAMPOS:
+                JOptionPane.showMessageDialog(null, "Cadastrado com Sucesso!!!");
         }
-
+        
     }//GEN-LAST:event_btn_CadastrarActionPerformed
-    // BOTAO EXCLUIR CADASTROS
+ // BOTAO EXCLUIR CADASTROS
     private void btn_ExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ExcluirActionPerformed
-
-        int posicao = jTabela.getSelectedRow();                              // Pega a posicao selecionada e colocar em uma variavel
+ 
+        int posicao  = jTabela.getSelectedRow();                              // Pega a posicao selecionada e colocar em uma variavel
         listCadastro.remove(posicao);                                         // Remove a posicao da lista
-        NumeroCadastrado.setText("Quant.Cadastrados: " + listCadastro.size());  // Atualiza o numero de cadastrados
-
+        NumeroCadastrado.setText("Quant.Cadastrados: "+listCadastro.size());  // Atualiza o numero de cadastrados
+        
         DefaultTableModel val = (DefaultTableModel) jTabela.getModel();
-        val.removeRow(posicao);   //Remove da Tabela o Item Selecionado       
+            val.removeRow(posicao);   //Remove da Tabela o Item Selecionado       
         camp_Nome.requestFocus();    // Volta o Cursor do mouse:
-
+        
     }//GEN-LAST:event_btn_ExcluirActionPerformed
-
-    public static void main(String args[]) {
-
+    
+    public static void main(String args[]) {        
+        
+        
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -440,4 +443,5 @@ public class Cadastro extends javax.swing.JFrame {
     private javax.swing.JTable jTabela;
     // End of variables declaration//GEN-END:variables
 
+    
 }

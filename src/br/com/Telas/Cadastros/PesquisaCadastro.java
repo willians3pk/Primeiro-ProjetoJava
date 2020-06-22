@@ -1,8 +1,8 @@
 
 package br.com.Telas.Cadastros;
 
-import br.com.classe.Aluno;
-import br.com.classe.Curso;
+import br.com.Class.Aluno;
+import br.com.Class.Curso;
 import java.util.ArrayList;
 
 public class PesquisaCadastro extends javax.swing.JFrame {

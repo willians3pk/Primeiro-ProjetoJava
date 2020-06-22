@@ -1,8 +1,8 @@
 
 package br.com.Telas.Professores;
 
-import br.com.classe.Endereco;
-import br.com.classe.Professor;
+import br.com.Class.Endereco;
+import br.com.Class.Professor;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;

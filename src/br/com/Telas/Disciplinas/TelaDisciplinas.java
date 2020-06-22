@@ -7,7 +7,7 @@ import br.com.Telas.Disciplinas.IntroducaoInformatica;
 import br.com.Telas.Disciplinas.Estatistica;
 import br.com.Telas.Disciplinas.MatematicaBasica;
 import br.com.Telas.Disciplinas.EstudoCasoComputacaoMovel;
-import br.com.classe.AlteraNomes;
+import br.com.Class.AlteraNomes;
 import java.awt.Color;
 
 public class TelaDisciplinas extends javax.swing.JPanel {
